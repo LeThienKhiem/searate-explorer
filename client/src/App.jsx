@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { COMMON_PORTS } from "./constants/ports";
 
-const API_BASE = "http://localhost:3001";
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV
+    ? "http://localhost:3001"
+    : "https://searate-explorer-production.up.railway.app");
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const CACHE_VERSION = "v3"; // Bump to invalidate old cached payloads
 
