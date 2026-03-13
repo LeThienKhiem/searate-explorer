@@ -1,4 +1,6 @@
-require('dotenv').config();
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 const express = require('express');
 const cors = require('cors');
 const puppeteer = require('puppeteer-extra');
@@ -12,9 +14,20 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res) =>
-  res.send('TBP SeaRates Server is UP and RUNNING!')
-);
+app.get('/', (req, res) => {
+  res.json({
+    message: 'TBP SeaRates Server is UP and RUNNING!',
+    environment_diagnostics: {
+      has_api_key: !!process.env.SEARATES_API_KEY,
+      api_key_length: process.env.SEARATES_API_KEY
+        ? process.env.SEARATES_API_KEY.length
+        : 0,
+      has_platform_id: !!process.env.SEARATES_PLATFORM_ID,
+      node_env: process.env.NODE_ENV || 'not set',
+      puppeteer_path: process.env.PUPPETEER_EXECUTABLE_PATH || 'not set',
+    },
+  });
+});
 
 app.get('/api/rates', async (req, res) => {
   const { from, to } = req.query;
