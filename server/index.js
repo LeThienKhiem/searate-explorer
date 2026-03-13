@@ -12,6 +12,10 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+app.get('/', (req, res) =>
+  res.send('TBP SeaRates Server is UP and RUNNING!')
+);
+
 app.get('/api/rates', async (req, res) => {
   const { from, to } = req.query;
 
@@ -40,6 +44,7 @@ app.get('/api/rates', async (req, res) => {
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
         '--disable-gpu',
+        '--single-process',
       ],
       executablePath:
         process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
@@ -66,6 +71,11 @@ app.get('/api/rates', async (req, res) => {
     });
 
     if (!sToken) {
+      if (browser) {
+        try {
+          await browser.close();
+        } catch {}
+      }
       return res.status(500).json({
         error: 'Failed to obtain s-token from SeaRates',
       });
@@ -110,6 +120,6 @@ app.get('/api/rates', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log('Server running on port ' + PORT);
 });
